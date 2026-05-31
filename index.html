@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mulyadi’s TypeLab 🧪</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="toolbar">
+    <h1 class="logo">Mulyadi’s TypeLab 🧪</h1>
+    <div class="controls">
+      <button id="btnPaste">📋 Paste Teks</button>
+      <button id="btnFullscreen">⛶ Fullscreen</button>
+      <button id="btnReset">🔄 Reset</button>
+    </div>
+  </header>
+
+  <div id="statsBar" class="stats hidden">
+    <div class="stat"><span class="label">⏱️ Waktu</span><span id="statTime">0.0s</span></div>
+    <div class="stat"><span class="label">🔤 WPM</span><span id="statWPM">0</span></div>
+    <div class="stat"><span class="label">🎯 Akurasi</span><span id="statAccuracy">100%</span></div>
+    <div class="stat"><span class="label">📝 Karakter</span><span id="statChars">0/0</span></div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <div class="container">
+    <div id="leftPanel" class="panel">
+      <div id="typedArea" class="content"></div>
+    </div>
+    <div id="rightPanel" class="panel">
+      <div id="referenceArea" class="content">Klik "Paste Teks" untuk memulai latihan...</div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
