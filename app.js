@@ -6,6 +6,7 @@ const state = {
   startTime: null,
   correctChars: 0,
   totalKeystrokes: 0,
+  totalErrors: 0,  // 🆕 Counter total kesalahan
   timerInterval: null
 };
 
@@ -17,6 +18,7 @@ const els = {
   statTime: document.getElementById('statTime'),
   statWPM: document.getElementById('statWPM'),
   statAccuracy: document.getElementById('statAccuracy'),
+  statErrors: document.getElementById('statErrors'),  // 🆕 Element untuk errors
   statChars: document.getElementById('statChars'),
   toast: document.getElementById('toast'),
   btnPaste: document.getElementById('btnPaste'),
@@ -61,7 +63,6 @@ function showToast(msg, type = 'info') {
 
 // 🖋️ Render UI
 function render() {
-  // Panel Kiri: Teks yang sudah diketik + Kursor
   els.typed.innerHTML = '';
   for (let i = 0; i < state.index; i++) {
     const span = document.createElement('span');
@@ -73,7 +74,6 @@ function render() {
   cursor.className = 'cursor-inline';
   els.typed.appendChild(cursor);
 
-  // Panel Kanan: Teks Referensi + Highlight Expected
   els.right.innerHTML = '';
   for (let i = 0; i < state.reference.length; i++) {
     const span = document.createElement('span');
@@ -84,10 +84,6 @@ function render() {
     els.right.appendChild(span);
   }
   
-  // 🆕 FOKUSKAN VIEW KIRI KE KURSOR (seperti panel kanan mengikuti target)
-  cursor.scrollIntoView({ block: 'center', behavior: 'auto' });
-
-  // FOKUSKAN VIEW KANAN KE KARAKTER YANG DIHARAPKAN
   const expected = els.right.querySelector('.expected');
   if (expected) expected.scrollIntoView({ block: 'nearest', behavior: 'auto' });
 }
@@ -99,11 +95,14 @@ function updateStats() {
   const minutes = elapsed / 60;
   
   const wpm = minutes > 0 ? Math.round((state.correctChars / 5) / minutes) : 0;
-  const accuracy = state.totalKeystrokes > 0 ? Math.round((state.correctChars / state.totalKeystrokes) * 100) : 100;
+  const accuracy = state.totalKeystrokes > 0 
+    ? Math.round((state.correctChars / (state.correctChars + state.totalErrors)) * 100) 
+    : 100;
   
   els.statTime.textContent = elapsed.toFixed(1) + 's';
   els.statWPM.textContent = wpm;
   els.statAccuracy.textContent = accuracy + '%';
+  els.statErrors.textContent = state.totalErrors;  // 🆕 Update error count
   els.statChars.textContent = `${state.index}/${state.reference.length}`;
 }
 
@@ -153,6 +152,7 @@ document.addEventListener('keydown', (e) => {
       playComplete();
     }
   } else {
+    state.totalErrors++;  // 🆕 Tambah counter kesalahan
     playError();
     els.left.classList.add('shake');
     setTimeout(() => els.left.classList.remove('shake'), 200);
@@ -168,11 +168,17 @@ els.btnPaste.addEventListener('click', async () => {
     
     state.reference = text.replace(/\r\n/g, '\n').replace(/\t/g, '    ');
     state.index = 0; state.isComplete = false;
-    state.startTime = null; state.correctChars = 0; state.totalKeystrokes = 0;
+    state.startTime = null; 
+    state.correctChars = 0; 
+    state.totalKeystrokes = 0;
+    state.totalErrors = 0;  // 🆕 Reset error counter
     clearInterval(state.timerInterval);
     els.statsBar.classList.add('hidden');
-    els.statTime.textContent = '0.0s'; els.statWPM.textContent = '0';
-    els.statAccuracy.textContent = '100%'; els.statChars.textContent = '0/0';
+    els.statTime.textContent = '0.0s'; 
+    els.statWPM.textContent = '0';
+    els.statAccuracy.textContent = '100%'; 
+    els.statErrors.textContent = '0';  // 🆕 Reset display
+    els.statChars.textContent = '0/0';
     
     els.right.textContent = '';
     render();
@@ -192,7 +198,10 @@ els.btnFullscreen.addEventListener('click', () => {
 // 🔄 Reset
 els.btnReset.addEventListener('click', () => {
   state.index = 0; state.isComplete = false;
-  state.startTime = null; state.correctChars = 0; state.totalKeystrokes = 0;
+  state.startTime = null; 
+  state.correctChars = 0; 
+  state.totalKeystrokes = 0;
+  state.totalErrors = 0;  // 🆕 Reset error counter
   clearInterval(state.timerInterval);
   els.statsBar.classList.add('hidden');
   render();
